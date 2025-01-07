@@ -1,0 +1,42 @@
+# Python cache directories
+__pycache__/
+.Server/__pycache__
+
+# Python package files
+*.egg-info/
+.pytest_cache/
+.venv/
+
+# IDE/editor specific files
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+
+# Test files
+*.pyc
+*.pyo
+*.swp
+
+# Local configuration files
+.env
+.env.*
+
+# Generated files
+*.json
+*.yaml
+*.yml
+
+# Secrets file
+secrets.json
+
+# Pre-commit hook configuration
+!.pre-commit-config.yaml
+
+# Files
+api.md
+db.md
+RoadMap.md
+db.pdf
