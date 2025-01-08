@@ -1,7 +1,7 @@
 import json
 
 
-def read_secrets(filename=".././secrets.json"):
+def read_secrets(filename="../../secrets.json"):
     """Reads secrets from a JSON file.
 
     Args:
