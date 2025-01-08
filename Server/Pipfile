@@ -8,11 +8,15 @@ fastapi = {extras = ["standard"], version = "*"}
 supabase = "*"
 pydantic = "*"
 requests = "*"
+sqlmodel = "*"
+python-dotenv = "*"
+psycopg2 = "*"
 
 [dev-packages]
 flake8 = "*"
 black = "*"
 pre-commit = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.12"
