@@ -4,8 +4,12 @@ from routes import auth
 
 app = FastAPI()
 
-run_migrations()
-init_db()
+
+@app.on_event("startup")
+def on_startup():
+    run_migrations()
+    init_db()
+
 
 app.include_router(auth.router)
 
