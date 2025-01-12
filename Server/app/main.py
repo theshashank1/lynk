@@ -1,9 +1,10 @@
-from database import init_db
+from database import init_db, run_migrations
 from fastapi import FastAPI, Request
 from routes import auth
 
 app = FastAPI()
 
+run_migrations()
 init_db()
 
 app.include_router(auth.router)

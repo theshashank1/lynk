@@ -10,11 +10,9 @@ load_dotenv()
 
 
 database_password = os.getenv("DB_PASSWORD")
-print(database_password)
-database_url = (
-    f"postgresql://postgres:{database_password}"
-    "@db.ljevkmlpgkaulnbriexd.supabase.co:5432/postgres"
-)
+
+database_url = os.getenv("DATABASE_URL")
+direct_url = os.getenv("DIRECT_URL")
 
 # Add error handling and connection pooling settings
 engine = create_engine(
@@ -25,6 +23,9 @@ engine = create_engine(
     pool_recycle=1800,
     echo=False,  # Set to True for SQL query logging
 )
+
+# Use the DIRECT_URL for migrations
+direct_engine = create_engine(direct_url, echo=False)
 
 
 # Session maker as context manager
@@ -46,3 +47,9 @@ def get_session() -> Generator[Session, None, None]:
 # Initialize tables
 def init_db():
     SQLModel.metadata.create_all(engine)
+
+
+# Migrations function (using direct URL)
+def run_migrations():
+    # Use direct connection for migrations
+    SQLModel.metadata.create_all(direct_engine)
