@@ -17,3 +17,10 @@ class User(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = Field(
         default=None, sa_column_kwargs={"onupdate": datetime.utcnow}
     )
+
+    class Config:
+        # Config to allow ORM behavior with SQLModel
+        from pydantic import BaseConfig
+
+        class Config(BaseConfig):
+            orm_mode = True
