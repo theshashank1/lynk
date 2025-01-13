@@ -1,22 +1,23 @@
 import os
-from contextlib import contextmanager
 from typing import Generator
 
 from dotenv import load_dotenv
 from sqlmodel import Session, SQLModel, create_engine
 
-# Load environment variables from .env file
+# Load environment variables from a .env file
 load_dotenv()
 
+# Fetch environment variables with validation
 
-database_password = os.getenv("DB_PASSWORD")
+DATABASE_URL = os.getenv("DB_URL")
 
-database_url = os.getenv("DATABASE_URL")
-direct_url = os.getenv("DIRECT_URL")
+# Validate that essential environment variables are set
+if not DATABASE_URL:
+    raise ValueError("One or more essential environment variables are not set.")
 
 # Add error handling and connection pooling settings
 engine = create_engine(
-    database_url,
+    DATABASE_URL,
     pool_size=5,
     max_overflow=10,
     pool_timeout=30,
@@ -24,13 +25,16 @@ engine = create_engine(
     echo=False,  # Set to True for SQL query logging
 )
 
-# Use the DIRECT_URL for migrations
-direct_engine = create_engine(direct_url, echo=False)
+# Test the connection
+try:
+    with engine.connect() as connection:
+        print("Connection successful!")
+except Exception as e:
+    raise ConnectionError(f"Failed to connect to the database: {e}")
 
 
 # Session maker as context manager
-@contextmanager
-def get_db_session() -> Generator[Session, None, None]:
+def get_session() -> Generator[Session, None, None]:
     session = Session(engine)
     try:
         yield session
@@ -38,18 +42,11 @@ def get_db_session() -> Generator[Session, None, None]:
         session.close()
 
 
-# FastAPI dependency
-def get_session() -> Generator[Session, None, None]:
-    with get_db_session() as session:
-        yield session
-
-
 # Initialize tables
 def init_db():
     SQLModel.metadata.create_all(engine)
 
 
-# Migrations function (using direct URL)
-def run_migrations():
-    # Use direct connection for migrations
-    SQLModel.metadata.create_all(direct_engine)
+# Example usage of init_db function
+if __name__ == "__main__":
+    init_db()
