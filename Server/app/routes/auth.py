@@ -24,11 +24,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 
 @router.post("/signup", response_model=SignupResponse)
-async def signup(
-    data: Signup,
-    provider: str = "Email",
-    session: SessionDep = None,  # Modified this line
-):
+async def signup(data: Signup, provider: str = "Email", session: SessionDep = None):
     if provider == "Email":
         if not data.email or not data.password:
             raise HTTPException(
