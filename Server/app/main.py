@@ -1,4 +1,4 @@
-from database import init_db, run_migrations
+from database import init_db
 from fastapi import FastAPI, Request
 from routes import auth
 
@@ -7,7 +7,6 @@ app = FastAPI()
 
 @app.on_event("startup")
 def on_startup():
-    run_migrations()
     init_db()
 
 
