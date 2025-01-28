@@ -1,6 +1,6 @@
 from database import init_db
 from fastapi import FastAPI, Request
-from routes import auth
+from routes import auth, media
 
 app = FastAPI()
 
@@ -11,6 +11,7 @@ def on_startup():
 
 
 app.include_router(auth.router)
+app.include_router(media.router)
 
 
 @app.post("/test")
