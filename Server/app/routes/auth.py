@@ -1,25 +1,20 @@
-import os
 from datetime import datetime  # Add this import
 from typing import Annotated  # Add this import
 
 from database import get_session
-from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
 from models import users
 from passlib.hash import bcrypt
 from schemas.auth import Provider, SigninResponse, Signup, SignupResponse
 from sqlmodel import Session
-from supabase import Client, create_client
+from supabase import Client
+from utils.supabase import get_supabase_client
 from utils.uuid import generate_username
 
 router = APIRouter(tags=["Authentication"])
 
-load_dotenv()
 
-url: str = os.environ.get("SUPABASE_URL") or ""
-key: str = os.environ.get("SUPABASE_ANON_KEY") or ""
-
-supabase: Client = create_client(url, key)
+supabase: Client = get_supabase_client()
 
 # Define the dependency type
 SessionDep = Annotated[Session, Depends(get_session)]
