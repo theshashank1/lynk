@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 
 class User(SQLModel, table=True):  # type: ignore[call-arg]
-    uid: str = Field(primary_key=True)
+    id: str = Field(primary_key=True)
     username: str = Field(max_length=50, unique=True)
     hashed_password: str = Field(nullable=False)
     email: str = Field(max_length=100, unique=True)

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime  # Add this import
 from typing import Annotated  # Add this import
 
 from database import get_session
@@ -45,7 +46,7 @@ async def signup(
             hashed_password = bcrypt.hash(data.password)
 
             user = users.User(
-                uid=response.user.id,
+                id=response.user.id,
                 email=data.email,
                 username=data.username or generate_username(data.email),
                 hashed_password=hashed_password,
@@ -65,7 +66,9 @@ async def signup(
 
 
 @router.post("/signin", response_model=SigninResponse)
-async def signin(data: Signup, provider: Provider = Provider.email):
+async def signin(
+    data: Signup, provider: Provider = Provider.email, session: SessionDep = None
+):
     if provider == "Email":
         if not data.email or not data.password:
             raise HTTPException(
@@ -80,10 +83,28 @@ async def signin(data: Signup, provider: Provider = Provider.email):
             if not response.user:
                 raise HTTPException(status_code=401, detail="Invalid credentials")
 
+            user = (
+                session.query(users.User)
+                .filter(users.User.id == response.user.id)
+                .first()
+            )
+
+            if not user:
+                raise HTTPException(
+                    status_code=404, detail="User not found in database"
+                )
+
+            user.is_verified = response.user.email_confirmed_at is not None
+            user.last_login_at = datetime.now()
+
+            session.commit()
+            session.refresh(user)
+
             return SigninResponse(
                 user_id=response.user.id, access_token=response.session.access_token
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     else:
+
         raise HTTPException(status_code=400, detail="Unsupported provider")
