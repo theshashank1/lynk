@@ -4,19 +4,25 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = {extras = ["standard"], version = "*"}
-supabase = "*"
 pydantic = "*"
-requests = "*"
-sqlmodel = "*"
 python-dotenv = "*"
 psycopg2 = "*"
+supabase = "*"
+fastapi = {extras = ["standard"], version = "*"}
+uvicorn = "*"
+passlib = "*"
+bcrypt = "*"
+sqlmodel = "*"
+shortuuid = "*"
+pytz = "*"
+uuid = "*"
+alembic = "*"
 
 [dev-packages]
 flake8 = "*"
-black = "*"
 pre-commit = "*"
 pytest = "*"
+black = "*"
 
 [requires]
 python_version = "3.12"
