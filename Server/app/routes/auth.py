@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
 from models import users
 from passlib.hash import bcrypt
-from schemas.auth import SigninResponse, Signup, SignupResponse
+from schemas.auth import Provider, SigninResponse, Signup, SignupResponse
 from sqlmodel import Session
 from supabase import Client, create_client
+from utils.uuid import generate_username
 
 router = APIRouter(tags=["Authentication"])
 
@@ -24,7 +25,9 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 
 @router.post("/signup", response_model=SignupResponse)
-async def signup(data: Signup, provider: str = "Email", session: SessionDep = None):
+async def signup(
+    data: Signup, provider: Provider = Provider.email, session: SessionDep = None
+):
     if provider == "Email":
         if not data.email or not data.password:
             raise HTTPException(
@@ -44,7 +47,7 @@ async def signup(data: Signup, provider: str = "Email", session: SessionDep = No
             user = users.User(
                 uid=response.user.id,
                 email=data.email,
-                username=data.username,
+                username=data.username or generate_username(data.email),
                 hashed_password=hashed_password,
                 is_verified=response.user.email_confirmed_at is not None,
                 created_at=response.user.created_at,
@@ -62,7 +65,7 @@ async def signup(data: Signup, provider: str = "Email", session: SessionDep = No
 
 
 @router.post("/signin", response_model=SigninResponse)
-async def signin(data: Signup, provider: str = "Email"):
+async def signin(data: Signup, provider: Provider = Provider.email):
     if provider == "Email":
         if not data.email or not data.password:
             raise HTTPException(

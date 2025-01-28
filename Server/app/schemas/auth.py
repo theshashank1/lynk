@@ -1,4 +1,13 @@
+from enum import Enum
+
 from pydantic import BaseModel
+
+
+class Provider(str, Enum):
+
+    email = "Email"
+    google = "Google"
+    facebook = "Facebook"
 
 
 class Signup(BaseModel):
