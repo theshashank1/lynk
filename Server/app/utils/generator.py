@@ -1,15 +1,25 @@
+import random
 import uuid
 
 
 def generate_unique_id(length: int = 4) -> str:
     """
-    Generate a unique ID of specified length using UUID.
+    Generate a unique ID of specified length by selecting a random sequence
+    from a hyphen-less UUID.
     """
-    # Generate a UUID and convert it to a string
-    unique_id = str(uuid.uuid4())
+    # Generate UUID and remove hyphens to ensure consistent length
+    uuid_str = str(uuid.uuid4()).replace("-", "")
 
-    # Extract the first 'length' characters from the UUID
-    return unique_id[:length].upper()
+    # Validate requested length
+    if not 1 <= length <= len(uuid_str):
+        raise ValueError(f"Length must be between 1 and {len(uuid_str)}")
+
+    # Determine the random starting index for the sequence
+    max_start = len(uuid_str) - length
+    start = random.randint(0, max_start)
+
+    # Extract and return the uppercase random sequence
+    return uuid_str[start : start + length]
 
 
 def generate_username(email: str, unique_id_length: int = 4) -> str:
@@ -30,7 +40,7 @@ def generate_username(email: str, unique_id_length: int = 4) -> str:
     email_prefix = email_prefix.replace(".", "_").replace("-", "_")
 
     # Generate unique ID
-    unique_id = generate_unique_id(unique_id_length)
+    unique_id = generate_unique_id(unique_id_length).upper()
 
     # Combine email prefix and unique ID
     return f"{email_prefix}_{unique_id}"
