@@ -34,7 +34,7 @@ except Exception as e:
 
 
 # Session maker as context manager
-def get_session() -> Generator[Session, None, None]:
+def get_db_session() -> Generator[Session, None, None]:
     session = Session(engine)
     try:
         yield session

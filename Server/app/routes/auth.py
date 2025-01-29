@@ -1,15 +1,15 @@
-from datetime import datetime  # Add this import
-from typing import Annotated  # Add this import
+from datetime import datetime
+from typing import Annotated
 
-from database import get_session
+from database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException
 from models import users
 from passlib.hash import bcrypt
 from schemas.auth import Provider, SigninResponse, Signup, SignupResponse
 from sqlmodel import Session
 from supabase import Client
+from utils.generator import generate_username
 from utils.supabase import get_supabase_client
-from utils.uuid import generate_username
 
 router = APIRouter(tags=["Authentication"])
 
@@ -17,7 +17,7 @@ router = APIRouter(tags=["Authentication"])
 supabase: Client = get_supabase_client()
 
 # Define the dependency type
-SessionDep = Annotated[Session, Depends(get_session)]
+SessionDep = Annotated[Session, Depends(get_db_session)]
 
 
 @router.post("/signup", response_model=SignupResponse)
