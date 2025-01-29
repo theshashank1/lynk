@@ -18,6 +18,7 @@ class Signup(BaseModel):
 
 class SignupResponse(BaseModel):
     user_id: str
+    username: str | None = None
 
 
 class SigninResponse(BaseModel):

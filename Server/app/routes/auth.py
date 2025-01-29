@@ -53,7 +53,7 @@ async def signup(
             session.commit()
             session.refresh(user)
 
-            return SignupResponse(user_id=response.user.id)
+            return SignupResponse(user_id=response.user.id, username=user.username)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     else:
