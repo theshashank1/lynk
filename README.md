@@ -156,9 +156,9 @@ As this project is in early development:
 2. 📢 Open issues for suggestions
 3. 💬 Join discussions
 
-## 📜 License
+<!-- ## 📜 License
 
-Project is under initial development. License pending.
+Project is under initial development. License pending. -->
 
 ---
 
