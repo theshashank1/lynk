@@ -5,27 +5,67 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from supabase import Client, create_client
 
-# Load environment variables
 load_dotenv()
 
-url: Optional[str] = os.environ.get("SUPABASE_URL")
-key: Optional[str] = os.environ.get("SUPABASE_ANON_KEY")
+# Fetch environment variables
+url: Optional[str] = os.getenv("SUPABASE_URL")
+key: Optional[str] = os.getenv("SUPABASE_ANON_KEY")
 
-supabase: Client = create_client(url or "", key or "")
+# Ensure Supabase credentials are available
+if not url or not key:
+    raise RuntimeError("Supabase environment variables are not set properly.")
 
 
-# Centralize Supabase configuration
-def get_supabase_client() -> Optional[Client]:
-    if not url:
+def get_supabase_client() -> Client:
+    """
+    Get a new Supabase client.
+
+    Returns:
+        Client: Supabase client instance
+
+    Raises:
+        HTTPException: If Supabase configuration is missing
+    """
+    try:
+        return create_client(url, key)
+    except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail="SUPABASE_URL is not properly configured in the environment",
+            status_code=500, detail=f"Failed to create Supabase client: {str(e)}"
         )
 
-    if not key:
+
+def get_user(client: Client):
+    """
+    Get the current user from Supabase.
+
+    Returns:
+        dict: User information
+
+    Raises:
+        HTTPException: If user is not authenticated or
+        if there's an error fetching user data
+    """
+    try:
+        supabase = client
+        response = supabase.auth.get_user()
+
+        if response is None or response.user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+
+        return response.user
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail="SUPABASE_ANON_KEY is not properly configured in the environment",
+            status_code=500, detail=f"Error fetching user data: {str(e)}"
         )
 
-    return create_client(url, key)
+    """Example usage
+    from fastapi import Depends
+    from app.utils.supabase import get_user, Client
+
+    @app.get("/user/me")
+    async def get_current_user(client: Client = Depends(get_supabase_client)):
+        user = await get_user(client)
+        return user
+    """
