@@ -2,27 +2,28 @@ from datetime import datetime
 from typing import Annotated
 
 from database import get_db_session
+from dependencies import get_supabase_client
 from fastapi import APIRouter, Depends, HTTPException
 from models import users
 from passlib.hash import bcrypt
 from schemas.auth import Provider, SigninResponse, Signup, SignupResponse
 from sqlmodel import Session
-from supabase import Client
 from utils.generator import generate_username
-from utils.supabase import get_supabase_client
+from utils.supabase import Client, get_user
 
 router = APIRouter(tags=["Authentication"])
 
-
-supabase: Client = get_supabase_client()
-
 # Define the dependency type
 SessionDep = Annotated[Session, Depends(get_db_session)]
+SupabaseDep = Annotated[Client, Depends(get_supabase_client)]
 
 
 @router.post("/signup", response_model=SignupResponse)
 async def signup(
-    data: Signup, provider: Provider = Provider.email, session: SessionDep = None
+    data: Signup,
+    session: SessionDep,
+    supabase: SupabaseDep,
+    provider: Provider = Provider.email,
 ):
     if provider == "Email":
         if not data.email or not data.password:
@@ -62,7 +63,10 @@ async def signup(
 
 @router.post("/signin", response_model=SigninResponse)
 async def signin(
-    data: Signup, provider: Provider = Provider.email, session: SessionDep = None
+    data: Signup,
+    session: SessionDep,
+    supabase: SupabaseDep,
+    provider: Provider = Provider.email,
 ):
     if provider == "Email":
         if not data.email or not data.password:
@@ -101,5 +105,9 @@ async def signin(
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     else:
-
         raise HTTPException(status_code=400, detail="Unsupported provider")
+
+
+@router.get("/me")
+async def me(supabase: SupabaseDep):
+    return get_user(supabase)
