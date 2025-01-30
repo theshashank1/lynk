@@ -23,4 +23,5 @@ class SignupResponse(BaseModel):
 
 class SigninResponse(BaseModel):
     user_id: str
+    username: str | None = None
     access_token: str
